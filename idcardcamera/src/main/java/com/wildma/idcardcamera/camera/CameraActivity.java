@@ -39,18 +39,18 @@ import com.wildma.idcardcamera.utils.ScreenUtils;
 public class CameraActivity extends Activity implements View.OnClickListener {
 
     private CropImageView mCropImageView;
-    private Bitmap        mCropBitmap;
+    private Bitmap mCropBitmap;
     private CameraPreview mCameraPreview;
-    private View          mLlCameraCropContainer;
-    private ImageView     mIvCameraCrop;
-    private ImageView     mIvCameraFlash;
-    private View          mLlCameraOption;
-    private View          mLlCameraResult;
-    private TextView      mViewCameraCropBottom;
-    private FrameLayout   mFlCameraOption;
-    private View          mViewCameraCropLeft;
+    private View mLlCameraCropContainer;
+    private ImageView mIvCameraCrop;
+    private ImageView mIvCameraFlash;
+    private View mLlCameraOption;
+    private View mLlCameraResult;
+    private TextView mViewCameraCropBottom;
+    private FrameLayout mFlCameraOption;
+    private View mViewCameraCropLeft;
 
-    private int     mType;//拍摄类型
+    private int mType;//拍摄类型
     private boolean isToast = true;//是否弹吐司，为了保证for循环只弹一次
 
     @Override
@@ -100,14 +100,14 @@ public class CameraActivity extends Activity implements View.OnClickListener {
     private void init() {
         setContentView(R.layout.activity_camera);
         mType = getIntent().getIntExtra(IDCardCamera.TAKE_TYPE, 0);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         initView();
         initListener();
     }
 
     private void initView() {
         mCameraPreview = (CameraPreview) findViewById(R.id.camera_preview);
-        mLlCameraCropContainer = findViewById(R.id.ll_camera_crop_container);
+//        mLlCameraCropContainer = findViewById(R.id.ll_camera_crop_container);
         mIvCameraCrop = (ImageView) findViewById(R.id.iv_camera_crop);
         mIvCameraFlash = (ImageView) findViewById(R.id.iv_camera_flash);
         mLlCameraOption = findViewById(R.id.ll_camera_option);
@@ -126,10 +126,10 @@ public class CameraActivity extends Activity implements View.OnClickListener {
         LinearLayout.LayoutParams containerParams = new LinearLayout.LayoutParams((int) width, ViewGroup.LayoutParams.MATCH_PARENT);
         LinearLayout.LayoutParams cropParams = new LinearLayout.LayoutParams((int) width, (int) height);
         LinearLayout.LayoutParams cameraOptionParams = new LinearLayout.LayoutParams((int) flCameraOptionWidth, ViewGroup.LayoutParams.MATCH_PARENT);
-        mLlCameraCropContainer.setLayoutParams(containerParams);
-        mIvCameraCrop.setLayoutParams(cropParams);
+//        mLlCameraCropContainer.setLayoutParams(containerParams);
+//        mIvCameraCrop.setLayoutParams(cropParams);
         //获取"相机裁剪区域"的宽度来动态设置底部"操作区域"的宽度，使"相机裁剪区域"居中
-        mFlCameraOption.setLayoutParams(cameraOptionParams);
+//        mFlCameraOption.setLayoutParams(cameraOptionParams);
 
         switch (mType) {
             case IDCardCamera.TYPE_IDCARD_FRONT:
@@ -219,24 +219,22 @@ public class CameraActivity extends Activity implements View.OnClickListener {
      * 裁剪图片
      */
     private void cropImage(Bitmap bitmap) {
-        /*计算扫描框的坐标点*/
-        float left = mViewCameraCropLeft.getWidth();
-        float top = mIvCameraCrop.getTop();
-        float right = mIvCameraCrop.getRight() + left;
-        float bottom = mIvCameraCrop.getBottom();
+//        /*计算扫描框的坐标点*/
+//        float left = mViewCameraCropLeft.getWidth();
+//        float top = mIvCameraCrop.getTop();
+//        float right = mIvCameraCrop.getRight() + left;
+//        float bottom = mIvCameraCrop.getBottom();
+//
+//        /*计算扫描框坐标点占原图坐标点的比例*/
+//        float leftProportion = left / mCameraPreview.getWidth();
+//        float topProportion = top / mCameraPreview.getHeight();
+//        float rightProportion = right / mCameraPreview.getWidth();
+//        float bottomProportion = bottom / mCameraPreview.getBottom();
 
-        /*计算扫描框坐标点占原图坐标点的比例*/
-        float leftProportion = left / mCameraPreview.getWidth();
-        float topProportion = top / mCameraPreview.getHeight();
-        float rightProportion = right / mCameraPreview.getWidth();
-        float bottomProportion = bottom / mCameraPreview.getBottom();
-
-        /*自动裁剪*/
-        mCropBitmap = Bitmap.createBitmap(bitmap,
-                (int) (leftProportion * (float) bitmap.getWidth()),
-                (int) (topProportion * (float) bitmap.getHeight()),
-                (int) ((rightProportion - leftProportion) * (float) bitmap.getWidth()),
-                (int) ((bottomProportion - topProportion) * (float) bitmap.getHeight()));
+        mCropBitmap = Bitmap.createBitmap(bitmap, 0,
+                (ScreenUtils.getScreenHeight(this) - mFlCameraOption.getHeight() - mIvCameraCrop.getHeight()) / 2,
+                bitmap.getWidth(),
+                mIvCameraCrop.getHeight());
 
         /*设置成手动裁剪模式*/
         runOnUiThread(new Runnable() {
