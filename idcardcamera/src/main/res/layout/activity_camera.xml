@@ -53,17 +53,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!--手动裁剪区域-->
-        <com.wildma.idcardcamera.cropper.CropImageView
-            android:id="@+id/crop_image_view"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/fl_camera_option"
-            app:layout_constraintDimensionRatio="16:9"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+<!--        &lt;!&ndash;手动裁剪区域&ndash;&gt;-->
+<!--        <com.wildma.idcardcamera.cropper.CropImageView-->
+<!--            android:id="@+id/crop_image_view"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"-->
+
+<!--            android:visibility="invisible"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/fl_camera_option"-->
+<!--            app:layout_constraintDimensionRatio="16:9"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent" />-->
 
         <!--相机裁剪区域底部-->
         <TextView

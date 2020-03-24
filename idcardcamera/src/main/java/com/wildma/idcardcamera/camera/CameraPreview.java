@@ -1,14 +1,17 @@
 package com.wildma.idcardcamera.camera;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.wildma.idcardcamera.utils.ScreenUtils;
 
@@ -67,18 +70,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 camera.setPreviewDisplay(holder);
 
                 Camera.Parameters parameters = camera.getParameters();
-                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
-                    camera.setDisplayOrientation(90);
-                    parameters.setRotation(90);
-                } else {
-                    camera.setDisplayOrientation(0);
-                    parameters.setRotation(0);
-                }
-                List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();//获取所有支持的预览大小
-                Camera.Size bestSize = getOptimalPreviewSize(sizeList, ScreenUtils.getScreenWidth(mContext), ScreenUtils.getScreenHeight(mContext));
-                parameters.setPreviewSize(bestSize.width, bestSize.height);//设置预览大小
+//                if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+//                    //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
+//                    camera.setDisplayOrientation(90);
+//                    parameters.setRotation(90);
+//                } else {
+//                    camera.setDisplayOrientation(0);
+//                    parameters.setRotation(0);
+//                }
+//                List<Camera.Size> sizeList = parameters.getSupportedPreviewSizes();//获取所有支持的预览大小
+//                Camera.Size bestSize = getOptimalPreviewSize(sizeList, ScreenUtils.getScreenWidth(mContext), ScreenUtils.getScreenHeight(mContext));
+                parameters.setPreviewSize(ScreenUtils.getScreenWidth(mContext),ScreenUtils.getScreenHeight(mContext));//设置预览大小
                 camera.setParameters(parameters);
+                setCameraDisplayOrientation(getContext(),findFrontFacingCameraID(),camera);
                 camera.startPreview();
                 focus();//首次对焦
                 //mAutoFocusManager = new AutoFocusManager(camera);//定时对焦
@@ -86,15 +90,17 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 Log.d(TAG, "Error setting camera preview: " + e.getMessage());
                 try {
                     Camera.Parameters parameters = camera.getParameters();
-                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                        //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
-                        camera.setDisplayOrientation(90);
-                        parameters.setRotation(90);
-                    } else {
-                        camera.setDisplayOrientation(0);
-                        parameters.setRotation(0);
-                    }
-                    camera.setParameters(parameters);
+//                    if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+//                        //竖屏拍照时，需要设置旋转90度，否者看到的相机预览方向和界面方向不相同
+//                        camera.setDisplayOrientation(90);
+//                        parameters.setRotation(90);
+//                    } else {
+//                        camera.setDisplayOrientation(0);
+//                        parameters.setRotation(0);
+//                    }
+//                    camera.setParameters(parameters);
+                    setCameraDisplayOrientation(getContext(),findFrontFacingCameraID(),camera);
+//                        parameters.setRotation(0);
                     camera.startPreview();
                     focus();//首次对焦
                     //mAutoFocusManager = new AutoFocusManager(camera);//定时对焦
@@ -104,6 +110,48 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 }
             }
         }
+    }
+
+    private int findFrontFacingCameraID() {
+        int cameraId = -1;
+        // Search for the front facing camera
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                Log.d(TAG, "Camera found");
+                cameraId = i;
+                break;
+            }
+        }
+        return cameraId;
+    }
+
+    public  void setCameraDisplayOrientation(Context activity,
+                                                   int cameraId, Camera camera) {
+        Camera.CameraInfo info =
+                new Camera.CameraInfo();
+        Camera.getCameraInfo(cameraId, info);
+        WindowManager wm = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+
+        int rotation = wm.getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        camera.setDisplayOrientation(result);
     }
 
     /**

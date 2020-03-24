@@ -26,7 +26,7 @@ import android.view.View;
  */
 public class CropOverlayView extends View {
 
-    private int defaultMargin = 100;
+    private int defaultMargin = 0;
     private int minDistance = 100;
     private int vertexSize = 30;
     private int gridSize = 3;
